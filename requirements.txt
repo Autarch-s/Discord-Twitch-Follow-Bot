@@ -1,0 +1,4 @@
+discord
+aiofiles==0.6.0
+asyncio==3.4.3
+aiohttp==3.7.4
