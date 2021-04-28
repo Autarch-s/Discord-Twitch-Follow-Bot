@@ -1,1 +1,2 @@
-# all people selling that source code dude, stop 
+# Discord-Twitch-Follow-Bot
+ALL PEOPLE SELLING THAT SOURCE CODE, BRUH, HERE IS IT FOR FREE 
