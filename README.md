@@ -1,1 +1,1 @@
-# Discord-Twitch-Follow-Bot
+# all people selling that source code dude, stop 
