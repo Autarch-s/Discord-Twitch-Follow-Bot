@@ -19,8 +19,8 @@ bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=intents
 bot.remove_command('help')
 
 administrators = []
-chat_channel = 
-bots_channel = 
+chat_channel = ''
+bots_channel = ''
 queue = []
 
 def zoom():
@@ -39,7 +39,6 @@ async def on_ready():
     for guild in bot.guilds:
         print(guild.name)
     print()
-    # bot.loop.create_task(status())
     while True:
         members = sum([guild.member_count for guild in bot.guilds])
         activity = discord.Activity(type=discord.ActivityType.watching, name=f'{members} users!')
@@ -240,82 +239,5 @@ async def tspam(ctx, channel, *, msg):
             await ctx.send(embed=embed)
 
 rfollow_cooldown = []
-
-@bot.command()
-@commands.cooldown(1, 600, type=commands.BucketType.user)
-async def rfollow(ctx, user_id, amount: int=None):
-    print(f'{ctx.author} | {ctx.author.id} -> /rfollow {user_id}')
-    if ctx.channel.type != discord.ChannelType.private:
-        if ctx.channel.id == bots_channel or ctx.author.id in administrators:
-            if str(user_id) in rfollow_cooldown and ctx.author.id not in administrators:
-                try:
-                    await ctx.message.delete()
-                except:
-                    pass
-            else:
-                try:
-                    int(user_id)
-                    max_amount = 0
-                    if ctx.author.id in administrators:
-                        rfollow.reset_cooldown(ctx)
-                        max_amount += 5000
-                    max_amount += 25
-                    if amount is None:
-                        amount = max_amount
-                    elif amount > max_amount:
-                        amount = max_amount
-                    if amount <= max_amount:
-                        premium = discord.utils.get(ctx.guild.roles, name='Premium')
-                        if premium in ctx.author.roles:
-                            position = len(queue) + 1
-                            embed = discord.Embed(color=16379747, description=f'Adding `{amount}` followers to `{user_id}`! (`1/{position}`)')
-                            await ctx.send(embed=embed)
-                            queue.insert(0, f'rfollow-{user_id}-{amount}')
-                        else:
-                            position = len(queue) + 1
-                            embed = discord.Embed(color=16379747, description=f'Adding `{amount}` followers to `{user_id}`! (`{position}/{position}`)')
-                            await ctx.send(embed=embed)
-                            queue.append(f'rfollow-{user_id}-{amount}')
-                        if ctx.author.id not in administrators:
-                            rfollow_cooldown.append(str(user_id))
-                            await asyncio.sleep(600)
-                            rfollow_cooldown.remove(str(user_id))
-                except:
-                    embed = discord.Embed(color=16379747, description='An error has occured while attempting to run this command!')
-                    await ctx.send(embed=embed)
-                    rfollow.reset_cooldown(ctx)
-        else:
-            await ctx.message.delete()
-            rfollow.reset_cooldown(ctx)
-
-@bot.command()
-async def rget(ctx, asset_id):
-    print(f'{ctx.author} | {ctx.author.id} -> /rget {asset_id}')
-    if ctx.channel.type != discord.ChannelType.private:
-        if ctx.channel.id == bots_channel:
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(f'https://assetdelivery.roblox.com/v1/asset?id={asset_id}') as r:
-                        r = await r.text()
-                    async with session.get(f'https://assetdelivery.roblox.com/v1/asset?id=' + re.search('id=(.*)</url>', r).group(1)) as r:
-                        r = await r.read()
-                try:
-                    f = await aiofiles.open(f'{asset_id}.png', mode='wb')
-                    await f.write(r)
-                    await f.close()
-                    embed = discord.Embed(color=16379747)
-                    file = discord.File(f'{asset_id}.png')
-                    embed.set_image(url=f'attachment://{asset_id}.png')
-                    await ctx.send(embed=embed, file=file)
-                finally:
-                    try:
-                        os.remove(f'{asset_id}.png')
-                    except:
-                        pass
-            except:
-                embed = discord.Embed(color=16379747, description='An error has occured while attempting to run this command!')
-                await ctx.send(embed=embed)
-        else:
-            await ctx.message.delete()
 
 bot.run(token)
